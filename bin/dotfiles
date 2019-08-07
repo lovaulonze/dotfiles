@@ -1,11 +1,21 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import os
 import sys
 
+# Deprecate python2
+if sys.version_info <= (3, 0):
+    from warnings import warn
+    warn("Dotfile is incompatible with python2 now. Please manually install python3 on your system.")
+    sys.exit()
+
+
+# PROJECT_ROOT_DIRECTORY = os.path.abspath(
+    # os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0]))))
 
 PROJECT_ROOT_DIRECTORY = os.path.abspath(
-    os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0]))))
+    os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
 PROJECT_VENDOR_DIRECTORY = os.path.join(PROJECT_ROOT_DIRECTORY, '.vendor')
 
 if (os.path.exists(os.path.join(PROJECT_ROOT_DIRECTORY, 'dotfiles'))
