@@ -161,6 +161,16 @@ class Dotfile(object):
         else:
             self.target.replace(self.name)
 
+    def sync(self, copy=False, debug=False):
+        """ Syncronize missing or conflicting files, no checking
+        forced option determined inside cli.sync() method
+        """
+        state = self.state
+        # DEBUG
+        echo("Current state is {0} for {1}".format(state, self.name))
+        
+        
+
     def enable(self, copy=False, debug=False, home=Path.home()):
         """Create a symlink or copy from name to target."""
         if copy:

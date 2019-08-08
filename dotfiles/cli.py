@@ -162,6 +162,49 @@ def status(repos, all, color):
     for repo in repos:
         show(repo, state)
 
+@cli.command()
+@click.option("-d", "--debug", is_flag=True,
+              help="Show what would be executed.")
+@click.option("-f", "--forced", is_flag=True,
+              help="Force overwrite of conflicting files")
+@click.option('-c', '--copy',  is_flag=True,
+              help='Copy files instead of creating symlinks.')
+@pass_repos
+def sync(repos, copy, debug, forced):
+    """Syncronize missing and conflicting files
+    
+    """
+    if len(repos) > 1:
+        raise NotImplementedError("Not able to treat more than 1 repos for now")
+
+    repo, = repos
+    # Check the missing and conflicting files
+    missing_dotfiles = []
+    conflict_dotfiles = []
+    for dotfile in repo.contents():
+        state = dotfile.state
+        if state == "missing":
+            missing_dotfiles.append(dotfile.name)
+        elif state == "conflict":
+            conflict_dotfiles.append(dotfile.name)
+
+    # Missing files
+    if not forced:
+        perform("sync", missing_dotfiles, repo, copy, debug)
+        click.echo("Conflicting files not synced. Overwrite them with --forced option")
+        if not debug:
+            click.echo("\nSyncronized {0:d} missing files.".format(len(missing_dotfiles)))
+
+    else:
+    # Conflicting only when forced
+        perform("sync", missing_dotfiles + conflict_dotfiles,
+                repo, copy, debug)
+        if not debug:
+            click.echo(("\nSyncronized {0:d} missing "
+                       "and {1:d} conflicting files.").format(len(missing_dotfiles),
+                                                                                           len(conflict_dotfiles)))
+
+
 
 @cli.command()
 @click.option('-c', '--copy',  is_flag=True,
