@@ -7,7 +7,7 @@ from shutil import copyfile
 
 from .exceptions import \
     IsSymlink, NotASymlink, Exists, NotFound, Dangling, \
-    TargetExists, TargetMissing
+    TargetExists, TargetMissing, InRepository
 
 UNUSED = False
 
@@ -56,7 +56,8 @@ class Dotfile(object):
 
     def _link(self, debug, home):
         """Create a symlink from name to target, no error checking.
-        If file is a symlink, copy its true identity to the target
+        If file is a symlink to another file,
+        copy its true identity to the target
         This feature is desired when using VCS like git etc..
         """
         source = self.name
@@ -135,7 +136,7 @@ class Dotfile(object):
         if copy:
             raise NotImplementedError()
         if self._is_present():
-            raise IsSymlink(self.name)
+            raise InRepository(self.short_name(home))
         if self.target.exists():
             raise TargetExists(self.name)
         self._ensure_dirs(debug)

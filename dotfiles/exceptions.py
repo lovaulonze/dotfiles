@@ -25,7 +25,7 @@ class NotASymlink(DotfileException):
 
 class InRepository(DotfileException):
     def __init__(self, path):
-        DotfileException.__init__(self, path, 'is within the repository')
+        DotfileException.__init__(self, path, 'is already within the repository')
 
 
 class NotRootedInHome(DotfileException):
