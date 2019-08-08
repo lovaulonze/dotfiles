@@ -11,6 +11,20 @@ from .exceptions import \
 
 UNUSED = False
 
+def _move_echo(source, target):
+    secho('MOVE  {0} -> {1}'.format(source, target), fg='yellow')
+
+def _copy_echo(source, target):
+    secho('COPY  {0} -> {1}'.format(source, target), fg='cyan')
+
+def _link_echo(source, target):
+    secho('LINK  {0} -> {1}'.format(source, target), fg='green')
+
+def _mkdir_echo(source):
+    secho('MKDIR  {0}'.format(source), fg='black')
+
+def _unlink_echo(source):
+    secho('UNLINK  {0}'.format(source), fg='magenta')
 
 class Dotfile(object):
     """A configuration file managed within a repository.
@@ -41,8 +55,7 @@ class Dotfile(object):
         def ensure(dir, debug):
             if not dir.is_dir():
                 if debug:
-                    secho('MKDIR  %s' % dir,
-                          fg='cyan')
+                    _mkdir_echo(dir)
                 else:
                     dir.mkdir(parents=True)
 
@@ -69,10 +82,8 @@ class Dotfile(object):
             # target = self.name.resolve()
             source_true_identity = self.name.resolve()
             if debug:
-                secho('COPY {0} -> {1}'.format(source_true_identity,
-                                               target),
-                      fg='yellow')
-                secho('UNLINK {0}'.format(source), fg='magenta')
+                _copy_echo(source_true_identity, target)
+                _unlink_echo(source)
             else:
                 copyfile(source_true_identity, target)
                 source.unlink()
@@ -81,16 +92,14 @@ class Dotfile(object):
             target = os.path.relpath(target, source.parent)
 
         if debug:
-            secho('LINK   %s -> %s' % (source, target),
-                  fg='green')
+            _link_echo(source, target)
         else:
             source.symlink_to(target)
 
     def _unlink(self, debug):
         """Remove a symlink in the home directory, no error checking."""
         if debug:
-            secho('UNLINK %s' % self.name,
-                  fg='magenta')
+            _unlink_echo(self.name)
         else:
             self.name.unlink()
 
@@ -142,8 +151,7 @@ class Dotfile(object):
         self._ensure_dirs(debug)
         if not self.name.is_symlink():
             if debug:
-                secho('MOVE   %s -> %s' % (self.name, self.target),
-                      fg='yellow')
+                _move_echo(self.name, self.target)
             else:
                 self.name.replace(self.target)
         self._link(debug, home)
@@ -156,8 +164,7 @@ class Dotfile(object):
             raise TargetMissing(self.name)
         self._unlink(debug)
         if debug:
-            secho('MOVE   %s -> %s' % (self.target, self.name),
-                  fg='yellow')
+            _move_echo(self.target, self.name)
         else:
             self.target.replace(self.name)
 
@@ -166,7 +173,17 @@ class Dotfile(object):
         forced option determined inside cli.sync() method
         """
         state = self.state
+        if state not in ("missing", "conflict"):
+            raise ValueError(("Something's wrong with the cli.sync method. "
+                              "Should only work on missing and conflicting files"))
         # DEBUG
+        if state == "conflict":
+            if debug:
+                _unlink_echo(self.name)
+            else:
+                self._unlink(self.name)
+        if debug:
+            pass
         echo("Current state is {0} for {1}".format(state, self.name))
         
         
