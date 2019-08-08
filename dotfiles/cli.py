@@ -58,7 +58,7 @@ def perform(method, files, repo, copy, debug):
                 click.secho('%s %s' % (msg, dotfile.short_name(repo.home)),
                             fg='green')
         except DotfileException as err:
-            click.secho(err, fg='red', bg='white', blink=True)
+            click.secho(str(err), fg='red', bg='white')
 
 
 pass_repos = click.make_pass_decorator(Repositories)
