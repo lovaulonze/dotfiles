@@ -168,7 +168,7 @@ class Dotfile(object):
         else:
             self.target.replace(self.name)
 
-    def sync(self, copy=False, debug=False):
+    def sync(self, copy=UNUSED, debug=False, home=Path.home()):
         """ Syncronize missing or conflicting files, no checking
         forced option determined inside cli.sync() method
         """
@@ -176,15 +176,12 @@ class Dotfile(object):
         if state not in ("missing", "conflict"):
             raise ValueError(("Something's wrong with the cli.sync method. "
                               "Should only work on missing and conflicting files"))
-        # DEBUG
+        # If conflicting files, remove the ones in home folder
+        """TODO backup"""
+        # print(self.name, self.state)
         if state == "conflict":
-            if debug:
-                _unlink_echo(self.name)
-            else:
-                self._unlink(self.name)
-        if debug:
-            pass
-        echo("Current state is {0} for {1}".format(state, self.name))
+            self._unlink(debug)
+        self._link(debug, home)
         
         
 
