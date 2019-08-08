@@ -94,6 +94,7 @@ class Dotfile(object):
         if debug:
             _link_echo(source, target)
         else:
+            self._ensure_dirs(debug)
             source.symlink_to(target)
 
     def _unlink(self, debug):
@@ -181,6 +182,7 @@ class Dotfile(object):
         # print(self.name, self.state)
         if state == "conflict":
             self._unlink(debug)
+        self._ensure_dirs(debug)
         self._link(debug, home)
         
         

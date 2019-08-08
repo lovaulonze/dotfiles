@@ -191,7 +191,8 @@ def sync(repos, copy, debug, forced):
     # Missing files
     if not forced:
         perform("sync", missing_dotfiles, repo, copy, debug)
-        click.echo("Conflicting files not synced. Overwrite them with --forced option")
+        if len(conflict_dotfiles) > 0:
+            click.echo("Conflicting files not synced. Overwrite them with --forced option")
         if not debug:
             click.echo("\nSyncronized {0:d} missing files.".format(len(missing_dotfiles)))
 
