@@ -1,6 +1,6 @@
 import os
 
-from click import echo
+from click import echo, secho
 from hashlib import md5
 from pathlib import Path
 
@@ -40,7 +40,8 @@ class Dotfile(object):
         def ensure(dir, debug):
             if not dir.is_dir():
                 if debug:
-                    echo('MKDIR  %s' % dir)
+                    secho('MKDIR  %s' % dir,
+                          fg='cyan')
                 else:
                     dir.mkdir(parents=True)
 
@@ -50,7 +51,7 @@ class Dotfile(object):
     def _prune_dirs(self, debug):
         # TODO
         if debug:
-            echo('PRUNE  <TODO>')
+            secho('PRUNE  <TODO>', fg='magenta', blink=True)
 
     def _link(self, debug, home):
         """Create a symlink from name to target, no error checking."""
@@ -64,14 +65,16 @@ class Dotfile(object):
             target = os.path.relpath(target, source.parent)
 
         if debug:
-            echo('LINK   %s -> %s' % (source, target))
+            secho('LINK   %s -> %s' % (source, target),
+                  fg='green')
         else:
             source.symlink_to(target)
 
     def _unlink(self, debug):
         """Remove a symlink in the home directory, no error checking."""
         if debug:
-            echo('UNLINK %s' % self.name)
+            secho('UNLINK %s' % self.name,
+                  fg='magenta')
         else:
             self.name.unlink()
 
@@ -123,7 +126,8 @@ class Dotfile(object):
         self._ensure_dirs(debug)
         if not self.name.is_symlink():
             if debug:
-                echo('MOVE   %s -> %s' % (self.name, self.target))
+                secho('MOVE   %s -> %s' % (self.name, self.target),
+                      fg='yellow')
             else:
                 self.name.replace(self.target)
         self._link(debug, home)
@@ -136,7 +140,8 @@ class Dotfile(object):
             raise TargetMissing(self.name)
         self._unlink(debug)
         if debug:
-            echo('MOVE   %s -> %s' % (self.target, self.name))
+            secho('MOVE   %s -> %s' % (self.target, self.name),
+                  fg='yellow')
         else:
             self.target.replace(self.name)
 

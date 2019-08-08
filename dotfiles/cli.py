@@ -42,8 +42,10 @@ def show(repo, state):
         char  = display['char']
         name = dotfile.short_name(repo.home)
         fg = display.get('color', None)
+        bg = display.get('bg', None)
         bold = display.get('bold', False)
-        click.secho('%c %s' % (char, name), fg=fg, bold=bold)
+        click.secho('{0:5s}: {1}'.format(char, name), fg=fg, bg=bg,
+                    bold=bold)
 
 
 def perform(method, files, repo, copy, debug):
@@ -53,9 +55,10 @@ def perform(method, files, repo, copy, debug):
             getattr(dotfile, method)(copy, debug)
             if not debug:
                 msg = '%s%s' % (method, 'd' if method[-1] == 'e' else 'ed')
-                click.echo('%s %s' % (msg, dotfile.short_name(repo.home)))
+                click.secho('%s %s' % (msg, dotfile.short_name(repo.home)),
+                            fg='green')
         except DotfileException as err:
-            click.echo(err)
+            click.secho(err, fg='red', bg='white', blink=True)
 
 
 pass_repos = click.make_pass_decorator(Repositories)
@@ -138,18 +141,23 @@ def status(repos, all, color):
     """
     bold = True if all and not color else False
     state = {
-        'missing':  {'char': '?', 'bold': bold},
-        'conflict': {'char': '!', 'bold': bold},
+        'missing':  {'char': 'Miss', 'bold': bold},
+        'conflict': {'char': 'Confl', 'bold': bold},
     }
 
     if all:
-        state['link'] = {'char': 'l'}
-        state['copy'] = {'char': 'c'}
-        state['external'] = {'char': 'e'}
+        state['link'] = {'char': 'Link',
+                         'color': 'green'}
+        state['copy'] = {'char': 'Copy',
+                         'color': 'blue'}
+        state['external'] = {'char': 'Extern',
+                             'color': 'cyan'}
 
     if color:
-        state['missing'].update( {'color': 'yellow'})
-        state['conflict'].update({'color': 'magenta'})
+        state['missing'].update( {'color': 'yellow',
+                                  'bg': 'white'})
+        state['conflict'].update({'color': 'red',
+                                  'bg': 'white'})
 
     for repo in repos:
         show(repo, state)

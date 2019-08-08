@@ -1,6 +1,6 @@
 import os
 
-from click import echo
+from click import echo, secho
 from pathlib import Path
 from fnmatch import fnmatch
 from operator import attrgetter
@@ -26,15 +26,17 @@ class Repositories(object):
 
 class Repository(object):
     """A repository is a directory that contains dotfiles."""
-    REMOVE_LEADING_DOT = True
-    IGNORE_PATTERNS = ['.git/*', '.gitignore', 'README*', '*~']
+    REMOVE_LEADING_DOT = False  # Keep default dot for MacSystems
+    IGNORE_PATTERNS = ['.git/*', '.gitignore', 'README*', '*~',
+                       "*#", ".DS_Store"]
 
     def __init__(self, path, home=Path.home()):
         self.path = Path(path).expanduser().resolve()
         self.home = Path(home).expanduser().resolve()
 
         if not self.path.exists():
-            echo('Creating new repository: %s' % self.path)
+            secho('Creating new repository: %s' % self.path,
+                  fg='blue')
             self.path.mkdir(parents=True, exist_ok=True)
 
         if not self.home.exists():
@@ -126,7 +128,7 @@ class Repository(object):
             try:
                 return self._dotfile(path)
             except DotfileException as err:
-                echo(err)
+                secho(str(err), fg='red', bg='white')  # Colored output
                 return None
 
         return [d for d in map(construct, paths) if d is not None]

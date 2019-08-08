@@ -3,11 +3,6 @@
 import os
 import sys
 
-# Deprecate python2
-if sys.version_info <= (3, 0):
-    from warnings import warn
-    warn("Dotfile is incompatible with python2 now. Please manually install python3 on your system.")
-    sys.exit()
 
 
 # PROJECT_ROOT_DIRECTORY = os.path.abspath(
@@ -27,5 +22,14 @@ for vendor in os.listdir(PROJECT_VENDOR_DIRECTORY):
     sys.path.insert(0, vendor)
 
 if __name__ == '__main__':
+    # Deprecate python2
+    from click import secho
+    if sys.version_info <= (3, 0):
+        secho(("Dotfile is incompatible with python2 now. \n"
+               "Please manually install python3 on your system."),
+              fg='red',
+              bg='white')
+        sys.exit()
+
     from dotfiles.cli import cli
     cli()
