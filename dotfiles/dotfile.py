@@ -3,6 +3,7 @@ import os
 from click import echo, secho
 from hashlib import md5
 from pathlib import Path
+from shutil import copyfile
 
 from .exceptions import \
     IsSymlink, NotASymlink, Exists, NotFound, Dangling, \
@@ -17,7 +18,7 @@ class Dotfile(object):
     :param name:   name of the symlink in the home directory (~/.vimrc)
     :param target: where the symlink should point to (~/Dotfiles/vimrc)
     """
-    RELATIVE_SYMLINKS = True
+    RELATIVE_SYMLINKS = False
 
     def __init__(self, name, target):
         # if not name.is_file() and not name.is_symlink():
@@ -54,13 +55,27 @@ class Dotfile(object):
             secho('PRUNE  <TODO>', fg='magenta', blink=True)
 
     def _link(self, debug, home):
-        """Create a symlink from name to target, no error checking."""
+        """Create a symlink from name to target, no error checking.
+        If file is a symlink, copy its true identity to the target
+        This feature is desired when using VCS like git etc..
+        """
         source = self.name
         target = self.target
+        
 
         if self.name.is_symlink():
-            source = self.target
-            target = self.name.resolve()
+            # source = self.target
+            # target = self.name.resolve()
+            source_true_identity = self.name.resolve()
+            if debug:
+                secho('COPY {0} -> {1}'.format(source_true_identity,
+                                               target),
+                      fg='yellow')
+                secho('UNLINK {0}'.format(source), fg='magenta')
+            else:
+                copyfile(source_true_identity, target)
+                source.unlink()
+            
         elif self.RELATIVE_SYMLINKS:
             target = os.path.relpath(target, source.parent)
 
