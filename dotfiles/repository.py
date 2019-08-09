@@ -27,8 +27,12 @@ class Repositories(object):
 class Repository(object):
     """A repository is a directory that contains dotfiles."""
     REMOVE_LEADING_DOT = False  # Keep default dot for MacSystems
-    IGNORE_PATTERNS = ['.git/*', '.gitignore', 'README*', '*~',
-                       "*#", ".DS_Store"]
+    IGNORE_PATTERNS = ['*/.git/*', '.gitignore', '.gitmodules',
+                       '.git', '.travis.yml',
+                       'README*',
+                       'Readme*',
+                       '*~',
+                       "*#", ".DS_Store", "LICENSE"]
 
     def __init__(self, path, home=Path.home()):
         self.path = Path(path).expanduser().resolve()
