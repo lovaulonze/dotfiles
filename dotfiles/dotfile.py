@@ -81,11 +81,17 @@ class Dotfile(object):
             # source = self.target
             # target = self.name.resolve()
             source_true_identity = self.name.resolve()
+            # Often there are bad symlink files that cannot be found
+            # Copy only when the true identify exists
+            if source_true_identity.exists():
+                if debug:
+                    _copy_echo(source_true_identity, target)
+                else:
+                    copyfile(source_true_identity, target)
+        
             if debug:
-                _copy_echo(source_true_identity, target)
                 _unlink_echo(source)
             else:
-                copyfile(source_true_identity, target)
                 source.unlink()
             
         elif self.RELATIVE_SYMLINKS:
