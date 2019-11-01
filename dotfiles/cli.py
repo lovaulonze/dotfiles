@@ -119,9 +119,9 @@ def remove(repos, debug, files):
 
 @cli.command()
 @click.option('-a', '--all',   is_flag=True, help='Show all dotfiles.')
-@click.option('-c', '--color', is_flag=True, help='Enable color output.')
+# @click.option('-c', '--color', is_flag=True, help='Enable color output.')
 @pass_repos
-def status(repos, all, color):
+def status(repos, all, color=True):
     """Show current status of dotfiles.
 
     By default only non-OK dotfiles are shown.  This can be overridden
@@ -138,6 +138,9 @@ def status(repos, all, color):
       * Missing: Not found in your home directory.
 
       * Conflict: Different from the file in your home directory.
+
+    By default, color output is enabled. this will have no effect if 
+    the terminal does not have ANSI support.
     """
     bold = True if all and not color else False
     state = {
@@ -153,11 +156,12 @@ def status(repos, all, color):
         state['external'] = {'char': 'Extern',
                              'color': 'cyan'}
 
-    if color:
-        state['missing'].update( {'color': 'yellow',
-                                  'bg': 'white'})
-        state['conflict'].update({'color': 'red',
-                                  'bg': 'white'})
+    # if color:
+    # By default, always show missing and conflict files
+    state['missing'].update({'color': 'yellow',
+                              'bg': 'white'})
+    state['conflict'].update({'color': 'red',
+                              'bg': 'white'})
 
     for repo in repos:
         show(repo, state)
