@@ -221,7 +221,7 @@ class Dotfile(object):
         """ Syncronize missing or conflicting files, no checking
         forced option determined inside cli.sync() method
         """
-        state = self.state
+        state = self.state["code"]
         if state not in ("missing", "conflict"):
             raise ValueError(("Something's wrong with the cli.sync method. "
                               "Should only work on missing and conflicting files"))

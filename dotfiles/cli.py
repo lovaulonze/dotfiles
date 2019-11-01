@@ -189,7 +189,7 @@ def sync(repos, copy, debug, forced):
     missing_dotfiles = []
     conflict_dotfiles = []
     for dotfile in repo.contents():
-        state = dotfile.state
+        state = dotfile.state["code"]
         if state == "missing":
             missing_dotfiles.append(dotfile.name)
         elif state == "conflict":
