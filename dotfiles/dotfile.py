@@ -3,7 +3,7 @@ import os
 from click import echo, secho
 from hashlib import md5
 from pathlib import Path
-from shutil import copyfile
+from shutil import copyfile, SameFileError
 
 from .exceptions import \
     IsSymlink, NotASymlink, Exists, NotFound, Dangling, \
@@ -11,20 +11,26 @@ from .exceptions import \
 
 UNUSED = False
 
+
 def _move_echo(source, target):
     secho('MOVE  {0} -> {1}'.format(source, target), fg='yellow')
+
 
 def _copy_echo(source, target):
     secho('COPY  {0} -> {1}'.format(source, target), fg='cyan')
 
+
 def _link_echo(source, target):
     secho('LINK  {0} -> {1}'.format(source, target), fg='green')
+
 
 def _mkdir_echo(source):
     secho('MKDIR  {0}'.format(source), fg='black')
 
+
 def _unlink_echo(source):
     secho('UNLINK  {0}'.format(source), fg='magenta')
+
 
 class Dotfile(object):
     """A configuration file managed within a repository.
@@ -75,7 +81,6 @@ class Dotfile(object):
         """
         source = self.name
         target = self.target
-        
 
         if self.name.is_symlink():
             # source = self.target
@@ -88,12 +93,12 @@ class Dotfile(object):
                     _copy_echo(source_true_identity, target)
                 else:
                     copyfile(source_true_identity, target)
-        
+
             if debug:
                 _unlink_echo(source)
             else:
                 source.unlink()
-            
+
         elif self.RELATIVE_SYMLINKS:
             target = os.path.relpath(target, source.parent)
 
@@ -102,6 +107,26 @@ class Dotfile(object):
         else:
             self._ensure_dirs(debug)
             source.symlink_to(target)
+
+    def _copy(self, debug):
+        """Copy the file from name to target without error checking.
+        If source file is symlink, do nothing
+        """
+        source = self.name
+        target = self.target
+
+        if self.name.is_symlink():
+            raise IsSymlink(self.name.as_posix())
+        
+
+        if debug:
+            _copy_echo(source, target)
+        else:
+            self._ensure_dirs(debug)
+            try:
+                copyfile(source.as_posix(), target.as_posix())
+            except SameFileError:
+                raise
 
     def _unlink(self, debug):
         """Remove a symlink in the home directory, no error checking."""
@@ -119,8 +144,13 @@ class Dotfile(object):
         return self.name.is_symlink() and (self.name.resolve() == self.target)
 
     def _same_contents(self):
-        return (md5(self.name.read_bytes()).hexdigest() == \
+        return (md5(self.name.read_bytes()).hexdigest() ==
                 md5(self.target.read_bytes()).hexdigest())
+
+    def _source_is_newer(self):
+        def _ctime(p):
+            return p.stat().st_ctime
+        return _ctime(self.name) > _ctime(self.target)
 
     @property
     def state(self):
@@ -140,6 +170,9 @@ class Dotfile(object):
 
         if not self._same_contents():
             # name exists, is a file, but differs from the target
+            # TODO: return the status of newer files
+            if self._source_is_newer():
+                print("{0} is newer than {1}".format(self.name, self.target))
             return 'conflict'
 
         return 'copy'
@@ -149,19 +182,20 @@ class Dotfile(object):
 
         The link is either a symlink or a copy.
         """
-        if copy:
-            raise NotImplementedError()
-        if self._is_present():
-            raise InRepository(self.short_name(home))
-        if self.target.exists():
-            raise TargetExists(self.name)
-        self._ensure_dirs(debug)
-        if not self.name.is_symlink():
-            if debug:
-                _move_echo(self.name, self.target)
-            else:
-                self.name.replace(self.target)
-        self._link(debug, home)
+        if copy:                # Copy to file
+            self._copy(debug)
+        else:                   # Symlink to target
+            if self._is_present():
+                raise InRepository(self.short_name(home))
+            if self.target.exists():
+                raise TargetExists(self.name)
+            self._ensure_dirs(debug)
+            if not self.name.is_symlink():
+                if debug:
+                    _move_echo(self.name, self.target)
+                else:
+                    self.name.replace(self.target)
+            self._link(debug, home)
 
     def remove(self, copy=UNUSED, debug=False):
         """Remove a dotfile and move target to its original location."""
@@ -190,8 +224,6 @@ class Dotfile(object):
             self._unlink(debug)
         self._ensure_dirs(debug)
         self._link(debug, home)
-        
-        
 
     def enable(self, copy=False, debug=False, home=Path.home()):
         """Create a symlink or copy from name to target."""

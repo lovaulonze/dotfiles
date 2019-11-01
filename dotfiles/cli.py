@@ -176,7 +176,7 @@ def status(repos, all, color=True):
 @pass_repos
 def sync(repos, copy, debug, forced):
     """Syncronize missing and conflicting files
-    
+       To replace the original `enable` method
     """
     if len(repos) > 1:
         raise NotImplementedError("Not able to treat more than 1 repos for now")
@@ -210,28 +210,32 @@ def sync(repos, copy, debug, forced):
                                                                                            len(conflict_dotfiles)))
 
 
-
-@cli.command()
-@click.option('-c', '--copy',  is_flag=True,
-              help='Copy files instead of creating symlinks.')
-@click.option('-d', '--debug', is_flag=True,
-              help='Show what would be executed.')
-@click.argument('files', nargs=-1, type=click.Path())
-@pass_repos
-def enable(repos, copy, debug, files):
-    """Link dotfiles into your home directory."""
-    repo = single(repos)
-    files = confirm('enable', files, repo)
-    perform('enable', files, repo, copy, debug)
+#####################
+# Danger Zone below #
+#####################
 
 
-@cli.command()
-@click.option('-d', '--debug', is_flag=True,
-              help='Show what would be executed.')
-@click.argument('files', nargs=-1, type=click.Path())
-@pass_repos
-def disable(repos, debug, files):
-    """Unlink dotfiles from your home directory."""
-    repo = single(repos)
-    files = confirm('disable', files, repo)
-    perform('disable', files, repo, False, debug)
+# @cli.command()
+# @click.option('-c', '--copy',  is_flag=True,
+#               help='Copy files instead of creating symlinks.')
+# @click.option('-d', '--debug', is_flag=True,
+#               help='Show what would be executed.')
+# @click.argument('files', nargs=-1, type=click.Path())
+# @pass_repos
+# def enable(repos, copy, debug, files):
+#     """Link dotfiles into your home directory."""
+#     repo = single(repos)
+#     files = confirm('enable', files, repo)
+#     perform('enable', files, repo, copy, debug)
+
+
+# @cli.command()
+# @click.option('-d', '--debug', is_flag=True,
+#               help='Show what would be executed.')
+# @click.argument('files', nargs=-1, type=click.Path())
+# @pass_repos
+# def disable(repos, debug, files):
+#     """Unlink dotfiles from your home directory."""
+#     repo = single(repos)
+#     files = confirm('disable', files, repo)
+#     perform('disable', files, repo, False, debug)
