@@ -36,7 +36,7 @@ def show(repo, state):
     """TODO"""
     for dotfile in repo.contents():
         try:
-            display = state[dotfile.state]
+            display = state[dotfile.state["code"]]
         except KeyError:
             continue
         char  = display['char']
@@ -46,6 +46,9 @@ def show(repo, state):
         bold = display.get('bold', False)
         click.secho('{0:5s}: {1}'.format(char, name), fg=fg, bg=bg,
                     bold=bold)
+        # Additional message comes as next line but indented
+        if "msg" in dotfile.state.keys():
+            click.secho("{0}".format(dotfile.state["msg"]), fg=fg)
 
 
 def perform(method, files, repo, copy, debug):
@@ -161,7 +164,7 @@ def status(repos, all, color=True):
     state['missing'].update({'color': 'yellow',
                               'bg': 'white'})
     state['conflict'].update({'color': 'red',
-                              'bg': 'white'})
+                              'bg': 'white',})
 
     for repo in repos:
         show(repo, state)

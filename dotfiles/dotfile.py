@@ -156,26 +156,34 @@ class Dotfile(object):
     def state(self):
         """The current state of this dotfile."""
         if self.target.is_symlink():
-            return 'external'
+            return dict(code='external')
 
         if not self.name.exists():
             # no $HOME file or symlink
-            return 'missing'
+            return dict(code='missing')
 
         if self.name.is_symlink():
             # name exists, is a link, but isn't a link to the target
             if not self.name.samefile(self.target):
-                return 'conflict'
-            return 'link'
+                return dict(code='conflict',
+                            msg="Source and target links are not same file!")
+            return dict(code='link')
 
         if not self._same_contents():
             # name exists, is a file, but differs from the target
             # TODO: return the status of newer files
             if self._source_is_newer():
-                print("{0} is newer than {1}".format(self.name, self.target))
-            return 'conflict'
+                msg=("       The version in your home path is newer. \n"
+                     "       Run dotfiles add -cf ~/{0} to overwrite.".
+                     format(self.name))
+            else:
+                msg=("       The version in Dotfiles repo is newer. \n"
+                     "       Run dotfiles sync -f {0} to overwrite.".
+                     format(self.name))
+            return dict(code='conflict',
+                        msg=msg)
 
-        return 'copy'
+        return dict(code='copy')
 
     def add(self, copy=False, debug=False, home=Path.home()):
         """Move a dotfile to its target and create a link.
