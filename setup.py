@@ -38,7 +38,7 @@ setup(
     tests_require=['pytest', 'pytest-flake8'],
     entry_points={
         'console_scripts': [
-            'dotfiles=dotfiles.cli:cli',
+            'dotman=dotman.cli:cli',
         ],
     },
 )

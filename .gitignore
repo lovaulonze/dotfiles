@@ -12,3 +12,4 @@ build/
 dist/
 dotfiles.egg-info/
 .eggs/
+*.py#
