@@ -5,7 +5,7 @@ from pathlib import Path
 from fnmatch import fnmatch
 from operator import attrgetter
 
-from .dotfile import Dotfile
+from .dotman import Dotfile
 from .exceptions import DotfileException, TargetIgnored
 from .exceptions import NotRootedInHome, InRepository, IsDirectory
 

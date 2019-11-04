@@ -217,7 +217,7 @@ class Dotfile(object):
         else:
             self.target.replace(self.name)
 
-    def sync(self, copy=UNUSED, debug=False, home=Path.home()):
+    def sync(self, copy=False, debug=False, home=Path.home()):
         """ Syncronize missing or conflicting files, no checking
         forced option determined inside cli.sync() method
         """
@@ -228,10 +228,13 @@ class Dotfile(object):
         # If conflicting files, remove the ones in home folder
         """TODO backup"""
         # print(self.name, self.state)
-        if state == "conflict":
-            self._unlink(debug)
-        self._ensure_dirs(debug)
-        self._link(debug, home)
+        if copy is False:       # only symlink method
+            if state == "conflict":
+                self._unlink(debug)
+            self._ensure_dirs(debug)
+            self._link(debug, home)
+        else:
+            self._copy()
 
     def enable(self, copy=False, debug=False, home=Path.home()):
         """Create a symlink or copy from name to target."""
