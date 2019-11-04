@@ -1,52 +1,25 @@
-# Dotfile Management Made Easy
+# `dotman`: a simple dotfiles manager based on `Python3`
 
-`dotfiles` is a tool to make managing your dotfile symlinks in `$HOME`
-easy, allowing you to keep all your dotfiles in a single directory.
+`dotman` is a python package that serves as a simple manager for the
+dotfiles. The code structure is inspired by
+[`dotfiles`][https://github.com/jbernard/dotfiles].
 
-Hosting is up to you. You can use a VCS like git, Dropbox, or even rsync
-to distribute your dotfiles repository across multiple hosts.
+`dotman` allows storing your dotfiles in a single folder by
+maintaining the original file structure. The folder can be distribute
+by VCS system or file syncronization services and deployed onto
+different systems using standard VCS branching.
 
-One or more repositories can be specified at runtime or with an
-environment variable, so you can manage multiple repositories without
-hassle.
-
-You can choose to have your dotfiles linked with symbolic links or
-copied into place, either way `dotfiles` will keep track of what's
-missing and what's different.
-
-`dotfiles` is unique in the way it manages links and copies.  The entire
-directory structure leading to a file is preserved and only the file
-itself is considered managed.  This allows managed and unmanaged files
-to live next to each other without needing to specify complicated ignore
-rules.  If you want to be less selective, you can specify a directory
-that contains several files, and `dotfiles` will grab all of them in
-whatever hierarchy they exist.
-
-## Upgrading From An Old Version
-
-Much has changed in the most recent version.  If you're considering
-upgrading it's probably best to unlink everything and start with an
-empty repository.  This can be done with the following command:
-
-    $ dotfiles --unsync
+By default, `dotman` stores the files in the synchronized folder by
+symbol links. You can also specify if the files should be copied
+instead of symlink.
 
 ## Installation
+`dotman` requires `Python` version larger than 3.4. Currently the
+installation is done using git, PyPI will come later.
 
-There are a few ways to install this thing.  The easiest way is using
-whatever package manager is available on your OS if there is an official
-package available.
-
-If not, you can install globally with pip:
-
-    $ pip install dotfiles
-
-If you don't want to or don't have permission to install it globally,
-you can install it just for your user:
-
-    $ pip install --user dotfiles
-
-If you just want to run it directly from the source tree, you can do
-that too:
+Most likely, the `dotman` package should be installed outside a
+particular python virtual environment, run the following codes to
+install the `HEAD` version:
 
     $ git clone https://github.com/jbernard/dotfiles
     $ cd dotfiles

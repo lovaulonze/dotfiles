@@ -5,25 +5,25 @@ from setuptools import setup
 with io.open("README.md", "rt", encoding="utf8") as f:
     readme = f.read()
 
-with io.open("dotfiles/__init__.py", "rt", encoding="utf8") as f:
+with io.open("dotman/__init__.py", "rt", encoding="utf8") as f:
     version = re.search(r"__version__ = \'(.*?)\'", f.read()).group(1)
 
 setup(
-    name='dotfiles',
+    name='dotman',
     version=version,
-    url='https://github.com/lovaulonze/dotfiles',
+    url='https://github.com/lovaulonze/dotman',
     project_urls={
-        'Code': 'https://github.com/lovaulonze/dotfiles',
-        'Issues': 'https://github.com/lovaulonze/dotfiles/issues',
+        'Code': 'https://github.com/lovaulonze/dotman',
+        'Issues': 'https://github.com/lovaulonze/dotman/issues',
     },
     license='ISC',
     author='LZ',
     author_email='',
-    description='Easily manage your dotfiles',
+    description='Dotfile manager implemented in python',
     long_description=readme,
     long_description_content_type='text/markdown',
-    packages=["dotfiles"],
-    python_requires=">=3.6",
+    packages=["dotman"],
+    python_requires=">=3.4",
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
